@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心情笔记</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 在 body 开始处添加登录模态框 -->
+    <div id="loginModal" class="login-page">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>心情笔记</h1>
+                <h3>登录</h3>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">用户名：</label>
+                    <input type="text" id="username" required placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码：</label>
+                    <input type="password" id="password" required placeholder="请输入密码">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">登录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 将原有内容包装在一个容器中 -->
+    <div id="mainContent" style="display: none;">
+        <div class="container">
+            <!-- 左侧导航栏 -->
+            <nav class="sidebar">
+                <div class="logo">
+                    <h1>心情笔记</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#diary">日记</a></li>
+                    <li><a href="#about">关于我</a></li>
+                </ul>
+                <!-- 社交媒体链接 -->
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-weibo"></i></a>
+                    <a href="#"><i class="fab fa-weixin"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-bilibili"></i></a>
+                </div>
+                <!-- 音乐播放器 -->
+                <div class="music-player">
+                    <audio id="bgMusic" preload="auto"></audio>
+                    <div class="music-controls">
+                        <div class="music-title">
+                            <span id="currentMusic">选择音乐</span>
+                            <button class="music-list-btn" onclick="toggleMusicList()">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <button id="playPauseBtn" class="music-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="music-info">
+                            <div class="music-progress">
+                                <div id="progressBar" class="progress-bar"></div>
+                            </div>
+                            <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
+                        </div>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="100">
+                        </div>
+                        <!-- 音乐列表 -->
+                        <div id="musicList" class="music-list" style="display: none;">
+                            <!-- 音乐列表将由 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-footer">
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> 退出登录
+                    </button>
+                </div>
+            </nav>
+
+            <!-- 主要内容区域 -->
+            <main class="content">
+                <!-- 首页部分 -->
+                <section id="home" class="section">
+                    <!-- 添加头部横幅 -->
+                    <div class="hero-banner">
+                        <div class="hero-content animate__animated animate__fadeIn">
+                            <h1>记录生活的美好时刻</h1>
+                            <p>分享故事，留住感动</p>
+                        </div>
+                    </div>
+
+                    <div class="blog-post">
+                        <div class="section-header">
+                            <h2><i class="fas fa-clock"></i> 最新动态</h2>
+                        </div>
+                        
+                        <div class="latest-diary" id="latest-diary">
+                            <!-- 最新日记将由JavaScript动态渲染 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 日记部分 -->
+                <section id="diary" class="section">
+                    <div class="blog-post">
+                        <div class="diary-header">
+                            <h2>我的日记</h2>
+                            <button class="add-diary-btn" onclick="openDiaryForm()">
+                                <i class="fas fa-plus"></i> 写日记
+                            </button>
+                        </div>
+
+                        <!-- 添加分类导航 -->
+                        <div class="diary-nav">
+                            <button class="diary-nav-btn active" data-category="all">
+                                <i class="fas fa-th-large"></i> 全部
+                                <span class="diary-count">0</span>
+                            </button>
+                            <button class="diary-nav-btn" data-category="生活随笔">
+                                <i class="fas fa-pencil-alt"></i> 生活随笔
+                                <span class="diary-count">0</span>
+                            </button>
+                            <button class="diary-nav-btn" data-category="旅行记录">
+                                <i class="fas fa-plane"></i> 旅行记录
+                                <span class="diary-count">0</span>
+                            </button>
+                            <button class="diary-nav-btn" data-category="美食日记">
+                                <i class="fas fa-utensils"></i> 美食日记
+                                <span class="diary-count">0</span>
+                            </button>
+                        </div>
+
+                        <!-- 日记列表容器 -->
+                        <div class="diary-container">
+                            <div class="diary-grid" id="diary-list">
+                                <!-- 日记内容将由 JavaScript 动态渲染 -->
+                            </div>
+                        </div>
+
+                        <!-- 删除原来的 post-form，添加模态框 -->
+                        <div id="diaryModal" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3>写日记</h3>
+                                    <span class="close" onclick="closeDiaryForm()">&times;</span>
+                                </div>
+                                <form id="diaryForm">
+                                    <div class="form-group">
+                                        <label for="title">标题：</label>
+                                        <input type="text" id="title" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="category">分类：</label>
+                                        <select id="category" required>
+                                            <option value="生活随笔">生活随笔</option>
+                                            <option value="旅行记录">旅行记录</option>
+                                            <option value="美食日记">美食日记</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="content">内容：</label>
+                                        <textarea id="content" rows="6" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="images">添加图片：</label>
+                                        <div class="image-upload-container">
+                                            <input type="file" id="images" accept="image/*" multiple class="image-input">
+                                            <div class="upload-button">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <span>点击或拖拽上传图片</span>
+                                            </div>
+                                            <div id="image-preview" class="image-preview-container"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="cancel-btn" onclick="closeDiaryForm()">取消</button>
+                                        <button type="submit" class="submit-btn">发布</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 添加日记详情模态框 -->
+                        <div id="diaryDetailModal" class="modal" style="display: none;">
+                            <div class="modal-content detail-modal">
+                                <div class="modal-header">
+                                    <h3>日记详情</h3>
+                                    <span class="close" onclick="closeDiaryDetail()">&times;</span>
+                                </div>
+                                <div id="diary-detail-content" class="diary-detail-content">
+                                    <!-- 详情内容将由 JavaScript 动态渲染 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 关于我部分 -->
+                <section id="about" class="section">
+                    <div class="blog-post">
+                        <div class="about-header">
+                            <h2>关于我</h2>
+                            <button class="edit-profile-btn" onclick="openProfileForm()">
+                                <i class="fas fa-cog"></i> 设置
+                            </button>
+                        </div>
+                        
+                        <!-- 添加个人信息编辑模态框 -->
+                        <div id="profileModal" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3>编辑个人信息</h3>
+                                    <span class="close" onclick="closeProfileForm()">&times;</span>
+                                </div>
+                                <form id="profileForm">
+                                    <div class="form-group">
+                                        <label>头像：</label>
+                                        <div class="avatar-upload">
+                                            <div class="avatar-preview">
+                                                <img id="avatarPreview" src="avatar.jpg" alt="头像预览">
+                                            </div>
+                                            <div class="avatar-edit">
+                                                <input type="file" id="avatarInput" accept="image/*" class="avatar-input">
+                                                <label for="avatarInput" class="avatar-upload-btn">
+                                                    <i class="fas fa-camera"></i>
+                                                    更换头像
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nickname">昵称：</label>
+                                        <input type="text" id="nickname" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bio">个人简介：</label>
+                                        <textarea id="bio" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>个人标签：</label>
+                                        <div class="tag-input-container">
+                                            <input type="text" id="tagInput" placeholder="输入标签后按回车添加">
+                                            <div id="tagContainer" class="tag-container"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">邮箱：</label>
+                                        <input type="email" id="email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="wechat">微信号：</label>
+                                        <input type="text" id="wechat" required>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="cancel-btn" onclick="closeProfileForm()">取消</button>
+                                        <button type="submit" class="submit-btn">保存</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="about-content" id="profileContent">
+                            <!-- 个人信息将由 JavaScript 动态渲染 -->
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="script.js"></script>
+</body>
+</html> 
